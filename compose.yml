@@ -12,6 +12,7 @@ services:
       - DATABASE_URL=jdbc:postgresql://main_postgres:5432/mydb
       - DATABASE_USER=myuser
       - DATABASE_PASSWORD=mypassword
+      - TAX_SERVICE_URL=http://imposto:8080
     networks:
       - backend
 
@@ -47,6 +48,30 @@ services:
       - 'RABBITMQ_DEFAULT_USER=myuser'
     ports:
       - '5672'
+
+  logger:
+    build:
+      context: ./logger
+    volumes:
+      - ./logger/src:/app/src
+    environment:
+      - DATABASE_URL=jdbc:postgresql://logger_postgres:5432/mydb
+      - DATABASE_USER=myuser
+      - DATABASE_PASSWORD=mypassword
+    ports:
+      - "8082:8080"
+    networks:
+      - backend
+    
+  logger_postgres:
+    image: postgres:17
+    container_name: logger_postgres_container
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    ports:
+      - "5433:5432"
 
 
 volumes:
