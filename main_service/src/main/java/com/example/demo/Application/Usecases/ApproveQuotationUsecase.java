@@ -10,12 +10,13 @@ import java.util.stream.Collectors;
 import org.apache.coyote.BadRequestException;
 import org.springframework.stereotype.Service;
 
+import com.example.demo.Application.Dtos.ApproveQuotationDto;
 import com.example.demo.Application.Dtos.ApprovedQuotationDto;
 import com.example.demo.Application.Dtos.QuotationDto;
 import com.example.demo.Application.Dtos.Assemblers.QuotationAssembler;
 import com.example.demo.Application.Services.QuotationDiscountService;
 import com.example.demo.Application.Services.QuotationPriceInfo;
-import com.example.demo.Application.Services.TaxStrategyService;
+import com.example.demo.Application.Services.TaxService;
 import com.example.demo.Domain.Entities.QuotationEntity;
 import com.example.demo.Domain.Entities.QuotedProductEntity;
 import com.example.demo.Infraestructure.Repositories.ProductStock;
@@ -31,20 +32,23 @@ public class ApproveQuotationUsecase {
     private final StockRepository stocksRepository;
     private final QuotationAssembler quotationAssembler;
     private final QuotationDiscountService quotationDiscountService;
+    private final TaxService taxService;
 
     public ApproveQuotationUsecase(QuotationRepository quotationRepository,
             QuotationAssembler quotationAssembler,
             StockRepository stocksRepository,
-            QuotationDiscountService quotationDiscountService) {
+            QuotationDiscountService quotationDiscountService,
+            TaxService taxService) {
         this.quotationRepository = quotationRepository;
         this.quotationAssembler = quotationAssembler;
         this.stocksRepository = stocksRepository;
         this.quotationDiscountService = quotationDiscountService;
+        this.taxService = taxService;
     }
 
     @Transactional
-    public ApprovedQuotationDto approveQuotation(QuotationEntity quotation, TaxStrategyService taxStrategyService)
-            throws BadRequestException {
+    public ApprovedQuotationDto approveQuotation(ApproveQuotationDto approveQuotationDto) throws BadRequestException {
+        QuotationEntity quotation = this.quotationRepository.getById(approveQuotationDto.getQuotationId());
 
         validateQuotation(quotation);
 
@@ -61,7 +65,7 @@ public class ApproveQuotationUsecase {
         approveQuotationAndPersistChanges(quotation, productsInStock);
 
         Double totalPrice = calculateTotalPrice(quotation);
-        QuotationPriceInfo quotationPriceInfo = calculateQuotationPriceInfo(quotation, taxStrategyService, totalPrice);
+        QuotationPriceInfo quotationPriceInfo = this.taxService.calculateTax(quotation);
         Double discount = calculateDiscount(quotation);
         Double finalPrice = calculateFinalPrice(quotationPriceInfo, discount);
 
@@ -104,13 +108,13 @@ public class ApproveQuotationUsecase {
                     System.out.println(productStock.getCurrentQuantity() - quantityToUpdate);
                     throw new BadRequestException("Insufficient stock for product: " + productStock.getProductId());
                 }
-    
+
                 productStock.setCurrentQuantity(productStock.getCurrentQuantity() - quantityToUpdate);
 
             } else {
                 throw new BadRequestException("Product not found in stock");
             }
-        }   
+        }
     }
 
     private void approveQuotationAndPersistChanges(QuotationEntity quotation, List<ProductStock> productsInStock) {
@@ -123,12 +127,6 @@ public class ApproveQuotationUsecase {
         return quotation.getProducts().stream()
                 .mapToDouble(product -> product.getProduct().getPrice() * product.getAmount())
                 .sum();
-    }
-
-    private QuotationPriceInfo calculateQuotationPriceInfo(QuotationEntity quotation,
-            TaxStrategyService taxStrategyService,
-            Double totalPrice) {
-        return taxStrategyService.calculateTax(quotation, totalPrice);
     }
 
     private Double calculateDiscount(QuotationEntity quotation) {

@@ -1,0 +1,58 @@
+services:
+  main:
+    build:
+      context: ./main_service
+    volumes:
+      - ./main_service/src:/app/src
+    ports:
+      - "8080:8080"
+    depends_on:
+      - main_postgres
+    environment:
+      - DATABASE_URL=jdbc:postgresql://main_postgres:5432/mydb
+      - DATABASE_USER=myuser
+      - DATABASE_PASSWORD=mypassword
+    networks:
+      - backend
+
+  main_postgres:
+    image: postgres:17
+    container_name: main_postgres_container
+    environment:
+      POSTGRES_USER: myuser
+      POSTGRES_PASSWORD: mypassword
+      POSTGRES_DB: mydb
+    ports:
+      - "5432:5432"
+    volumes:
+      - main_postgres_data:/var/lib/postgresql/data
+    networks:
+      - backend
+
+
+  imposto:
+    build:
+      context: ./imposto
+    volumes:
+      - ./imposto/src:/app/src
+    ports:
+      - "8081:8080"
+    networks:
+      - backend
+
+  rabbitmq:
+    image: 'rabbitmq:latest'
+    environment:
+      - 'RABBITMQ_DEFAULT_PASS=secret'
+      - 'RABBITMQ_DEFAULT_USER=myuser'
+    ports:
+      - '5672'
+
+
+volumes:
+  main_postgres_data:
+
+
+networks:
+  backend:
+    driver: bridge

@@ -14,7 +14,7 @@ import com.example.demo.Application.Dtos.ApproveQuotationDto;
 import com.example.demo.Application.Dtos.ApprovedQuotationDto;
 import com.example.demo.Application.Dtos.CreateQuotationDto;
 import com.example.demo.Application.Dtos.QuotationDto;
-import com.example.demo.Application.Services.ApproveQuotationUsecaseHandler;
+import com.example.demo.Application.Usecases.ApproveQuotationUsecase;
 import com.example.demo.Application.Usecases.CreateQuotationUsecase;
 import com.example.demo.Application.Usecases.GetAllQuotationsByDate;
 
@@ -25,14 +25,14 @@ import jakarta.validation.Valid;
 public class QuotationController {
 
     private final CreateQuotationUsecase createQuotationUsecase;
-    private final ApproveQuotationUsecaseHandler approveQuotationUsecaseHandler;
+    private final ApproveQuotationUsecase approveQuotationUsecase;
     private final GetAllQuotationsByDate getAllQuotationsByDate;
 
     public QuotationController(CreateQuotationUsecase createQuotationUsecase,
-            ApproveQuotationUsecaseHandler approveQuotationUsecaseHandler,
+            ApproveQuotationUsecase approveQuotationUsecase,
             GetAllQuotationsByDate getAllQuotationsByDate) {
         this.createQuotationUsecase = createQuotationUsecase;
-        this.approveQuotationUsecaseHandler = approveQuotationUsecaseHandler;
+        this.approveQuotationUsecase = approveQuotationUsecase;
         this.getAllQuotationsByDate = getAllQuotationsByDate;
     }
 
@@ -45,11 +45,11 @@ public class QuotationController {
     @PostMapping("/approve")
     public ApprovedQuotationDto approveQuotation(@Valid @RequestBody ApproveQuotationDto approveQuotationDto)
             throws BadRequestException {
-        return approveQuotationUsecaseHandler.handler(approveQuotationDto);
+        return approveQuotationUsecase.approveQuotation(approveQuotationDto);
     }
 
     @GetMapping("/by-date")
-    public List<QuotationDto> getAllQuotationsByDate(@Valid @RequestParam (name = "initialDate") String initialDate,
+    public List<QuotationDto> getAllQuotationsByDate(@Valid @RequestParam(name = "initialDate") String initialDate,
             @RequestParam(name = "finalDate") String finalDate) throws BadRequestException {
         return getAllQuotationsByDate.getAllQuotationsByDate(initialDate, finalDate);
     }
