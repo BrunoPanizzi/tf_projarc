@@ -1,8 +1,11 @@
 package com.example.logger.application.assemblers;
 
+import org.springframework.stereotype.Component;
+
 import com.example.logger.domain.entities.ApprovedQuotationEntity;
 import com.example.logger.dtos.ApprovedQuotationDto;
 
+@Component
 public class ApprovedQuotationAssembler {
 
     public ApprovedQuotationDto toDto(

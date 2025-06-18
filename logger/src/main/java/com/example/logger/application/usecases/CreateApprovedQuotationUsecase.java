@@ -2,12 +2,15 @@ package com.example.logger.application.usecases;
 
 import java.time.Instant;
 
+import org.springframework.stereotype.Service;
+
 import com.example.logger.application.assemblers.ApprovedQuotationAssembler;
 import com.example.logger.domain.entities.ApprovedQuotationEntity;
 import com.example.logger.dtos.ApprovedQuotationDto;
 import com.example.logger.dtos.CreateApprovedQuotationDto;
 import com.example.logger.infraestructure.Repositories.ApprovedQuotationRepository;
 
+@Service
 public class CreateApprovedQuotationUsecase {
 
     private ApprovedQuotationRepository approvedQuotationRepository;

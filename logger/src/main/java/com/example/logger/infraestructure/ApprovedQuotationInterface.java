@@ -11,5 +11,5 @@ import com.example.logger.infraestructure.Models.ApprovedQuotation;
 
 @Repository
 public interface ApprovedQuotationInterface extends JpaRepository<ApprovedQuotation, UUID> {
-     List<ApprovedQuotation> findByCreatedAtBetween(Instant startDate, Instant endDate);
+     List<ApprovedQuotation> findByApprovedAtBetween(Instant startDate, Instant endDate);
 }
