@@ -1,5 +1,3 @@
-# write a simple docker file for a modern java project using spring boot and maven
-
 FROM maven:3.9.9
 
 WORKDIR /app

@@ -58,6 +58,9 @@ services:
       - DATABASE_URL=jdbc:postgresql://logger_postgres:5432/mydb
       - DATABASE_USER=myuser
       - DATABASE_PASSWORD=mypassword
+    depends_on:
+      - logger_postgres
+      - rabbitmq
     ports:
       - "8082:8080"
     networks:
