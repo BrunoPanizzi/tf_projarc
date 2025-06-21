@@ -1,6 +1,8 @@
 package com.example.logger.application.usecases;
 
 import java.time.Instant;
+import java.time.LocalDate;
+import java.time.ZoneOffset;
 
 import org.springframework.stereotype.Service;
 
@@ -22,13 +24,21 @@ public class CreateApprovedQuotationUsecase {
         this.approvedQuotationAssembler = approvedQuotationAssembler;
     }
 
-    public ApprovedQuotationDto create(CreateApprovedQuotationDto createApprovedQuotationDto) {
-        ApprovedQuotationEntity approvedQuotationEntity = approvedQuotationRepository.create(
-                Instant.parse(createApprovedQuotationDto.approvedAtIso()),
-                createApprovedQuotationDto.taxAmount(),
-                createApprovedQuotationDto.totalPrice());
-
-        return approvedQuotationAssembler.toDto(approvedQuotationEntity);
+public ApprovedQuotationDto create(CreateApprovedQuotationDto createApprovedQuotationDto) {
+    Instant approvedAt;
+    String approvedAtIso = createApprovedQuotationDto.approvedAtIso();
+    if (approvedAtIso.length() == 10) {
+        approvedAt = LocalDate.parse(approvedAtIso).atStartOfDay().toInstant(ZoneOffset.UTC);
+    } else {
+        approvedAt = Instant.parse(approvedAtIso);
     }
+
+    ApprovedQuotationEntity approvedQuotationEntity = approvedQuotationRepository.create(
+            approvedAt,
+            createApprovedQuotationDto.taxAmount(),
+            createApprovedQuotationDto.totalPrice());
+
+    return approvedQuotationAssembler.toDto(approvedQuotationEntity);
+}
 
 }
