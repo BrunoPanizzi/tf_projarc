@@ -1,15 +1,17 @@
-package com.example.imposto.presentation.dtos;
+package com.example.demo.Application.Dtos;
 
 import java.util.List;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class TaxCalculationDto {
+@Builder
+public class TaxRequestDto {
     private String state;
-    private List<ProductDto> products;
+    private List<TaxRequestProductDto> products;
 }

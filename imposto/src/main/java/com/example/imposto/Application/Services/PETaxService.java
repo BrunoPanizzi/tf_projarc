@@ -31,7 +31,7 @@ public class PETaxService extends TaxStrategy {
                 .tax(totalTax)
                 .originalPrice(originalPrice)
                 .finalPrice(originalPrice + totalTax)
-                .state(State.PE)
+                .state(State.PERNAMBUCO)
                 .build();
     }
 }

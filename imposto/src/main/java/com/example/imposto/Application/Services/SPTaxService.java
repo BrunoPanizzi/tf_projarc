@@ -19,7 +19,7 @@ public class SPTaxService extends TaxStrategy {
                 .tax(tax)
                 .originalPrice(totalPrice)
                 .finalPrice(totalPrice + tax)
-                .state(State.SP)
+                .state(State.SAO_PAULO)
                 .build();
     }
 }

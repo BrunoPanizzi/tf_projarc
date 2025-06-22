@@ -23,7 +23,7 @@ public class RSTaxService extends TaxStrategy {
                 .tax(tax)
                 .originalPrice(totalPrice)
                 .finalPrice(totalPrice + tax)
-                .state(State.RS)
+                .state(State.RIO_GRANDE_DO_SUL)
                 .build();
     }
 
