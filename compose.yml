@@ -22,6 +22,10 @@ services:
       - DATABASE_USER=myuser
       - DATABASE_PASSWORD=mypassword
       - TAX_SERVICE_URL=http://nginx/tax
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=myuser
+      - RABBITMQ_PASSWORD=secret
     networks:
       - backend
 
@@ -53,12 +57,14 @@ services:
       - backend
 
   rabbitmq:
-    image: 'rabbitmq:latest'
+    image: "rabbitmq:latest"
     environment:
-      - 'RABBITMQ_DEFAULT_PASS=secret'
-      - 'RABBITMQ_DEFAULT_USER=myuser'
+      - "RABBITMQ_DEFAULT_PASS=secret"
+      - "RABBITMQ_DEFAULT_USER=myuser"
     expose:
-      - '5672'
+      - "5672"
+    networks:
+      - backend
 
   logger:
     build:
@@ -69,6 +75,10 @@ services:
       - DATABASE_URL=jdbc:postgresql://logger_postgres:5432/mydb
       - DATABASE_USER=myuser
       - DATABASE_PASSWORD=mypassword
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
+      - RABBITMQ_USER=myuser
+      - RABBITMQ_PASSWORD=secret
     depends_on:
       - logger_postgres
       - rabbitmq

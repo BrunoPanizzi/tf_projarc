@@ -14,6 +14,7 @@ import com.example.demo.Application.Dtos.ApproveQuotationDto;
 import com.example.demo.Application.Dtos.ApprovedQuotationDto;
 import com.example.demo.Application.Dtos.QuotationDto;
 import com.example.demo.Application.Dtos.Assemblers.QuotationAssembler;
+import com.example.demo.Application.Events.ApprovedQuotationEventPublisher;
 import com.example.demo.Application.Services.QuotationDiscountService;
 import com.example.demo.Application.Services.QuotationPriceInfo;
 import com.example.demo.Application.Services.TaxService;
@@ -33,17 +34,20 @@ public class ApproveQuotationUsecase {
     private final QuotationAssembler quotationAssembler;
     private final QuotationDiscountService quotationDiscountService;
     private final TaxService taxService;
+    private final ApprovedQuotationEventPublisher eventPublisher;
 
     public ApproveQuotationUsecase(QuotationRepository quotationRepository,
             QuotationAssembler quotationAssembler,
             StockRepository stocksRepository,
             QuotationDiscountService quotationDiscountService,
-            TaxService taxService) {
+            TaxService taxService,
+            ApprovedQuotationEventPublisher eventPublisher) {
         this.quotationRepository = quotationRepository;
         this.quotationAssembler = quotationAssembler;
         this.stocksRepository = stocksRepository;
         this.quotationDiscountService = quotationDiscountService;
         this.taxService = taxService;
+        this.eventPublisher = eventPublisher;
     }
 
     @Transactional
@@ -69,7 +73,11 @@ public class ApproveQuotationUsecase {
         Double discount = calculateDiscount(quotation);
         Double finalPrice = calculateFinalPrice(quotationPriceInfo, discount);
 
-        return buildApprovedQuotationDto(quotation, totalPrice, quotationPriceInfo, discount, finalPrice);
+        var response = buildApprovedQuotationDto(quotation, totalPrice, quotationPriceInfo, discount, finalPrice);
+
+        this.eventPublisher.sendApprovedQuotation(response);
+
+        return response;
     }
 
     private void validateQuotation(QuotationEntity quotation) throws BadRequestException {
